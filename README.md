@@ -11,9 +11,12 @@ PicoPAC is a multicart DIY yourself based on cheap "PURPLE" Raspberry Pi Pico cl
 Please don't forget to upload the here provided "selectgame.bin" file in flash!!!!
 
 ![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/picopac3.jpg)
+![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/picopac6.jpg)
 ![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/picopac1.jpg)
 ![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/picopac5.jpg)
-![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/picopac6.jpg)
+![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/picopac7.jpg)
+![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/picopac8.jpg)
+
 
 Kicad project and gerbers files for the pcb are in the PCB folder, you need only a diode and a push buttons for resetting the cart if needed or want restart. 
 Add you pico clone, and flash the firmware ".uf2" in the Pico by connecting it while pressing button on Pico and drop it in the opened windows on PC.
