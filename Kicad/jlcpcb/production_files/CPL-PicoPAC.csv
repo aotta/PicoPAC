@@ -1,0 +1,6 @@
+Designator,Val,Package,Mid X,Mid Y,Rotation,Layer
+D1,Diode ,D_DO-35_SOD27_P7.62mm_Horizontal,32.015,-95.565,90.0,top
+J1,Videopac-edgeconnector,videopac-edgecon,54.0,-124.25,0.0,top
+J2,Conn_01x20,PinSocket_1x20_P2.54mm_Vertical,43.3,-80.255,0.0,top
+J3,Conn_01x20,PinSocket_1x20_P2.54mm_Vertical,61.1,-80.25,0.0,top
+SW1,SW_Push,SW_PUSH_6mm,75.525,-60.775,0.0,top

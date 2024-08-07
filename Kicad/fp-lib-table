@@ -1,0 +1,6 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "videopac-usbcart-kicad5")(type "KiCad")(uri "D:/Documents/GitHub/videopac-usbcart-kicad5")(options "")(descr ""))
+  (lib (name "KiCad")(type "KiCad")(uri "C:/Users/Andrea/Documents/Retrocomputer/Philips Videopac/Videopac_USBCART-master/KiCad")(options "")(descr ""))
+  (lib (name "videopac-usbcart-kicad5-backups")(type "KiCad")(uri "${KIPRJMOD}/videopac-usbcart-kicad5-backups")(options "")(descr ""))
+)

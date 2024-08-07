@@ -1,0 +1,6 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "videopac")(type "KiCad")(uri "${KIPRJMOD}/videopac.kicad_sym")(options "")(descr ""))
+  (lib (name "videopac-edgeconnector")(type "KiCad")(uri "${KIPRJMOD}/videopac-edgeconnector.kicad_sym")(options "")(descr ""))
+  (lib (name "idt7006pf-pn64")(type "KiCad")(uri "${KIPRJMOD}/idt7006pf-pn64.kicad_sym")(options "")(descr ""))
+)
