@@ -144,7 +144,8 @@ char extram[0xff];
 ////////////////////////////////////////////////////////////////////////////////////
 void error(int numblink){
  	multicore_lockout_start_blocking();	
-    gpio_init(PICO_DEFAULT_LED_PIN);
+    sleep_ms(1000);
+	gpio_init(PICO_DEFAULT_LED_PIN);
 	gpio_set_dir(PICO_DEFAULT_LED_PIN,GPIO_OUT);
   while(1){
 
@@ -180,29 +181,32 @@ void __not_in_flash_func(core1_main()) {
     //gpio_set_dir_in_masked(ALWAYS_IN_MASK);
 	
    newgame=0;
+   gamechoosen=0;
 
     // Initial conditions
-    SET_DATA_MODE_IN;
+    //SET_DATA_MODE_IN;
+	
 	while(newgame==0) {
+	//while(1) {
 		 	pins=gpio_get_all();
 	        addr = (pins & 0b0111111111111);  
-			if((gpio_get(CS_PIN)==0) && (gpio_get(WR_PIN)==0)) {
-				   extram[addr & 0xff]=((pins & DATA_PIN_MASK)>>D0_PIN);	
-				   if (extram[0x7e]==0x0a) {
-					  gamechoosen=extram[0x7f];
-				   }
-			} else {
 			bank=3-((gpio_get(P10_PIN)+(gpio_get(P11_PIN)*2)));
-	   	  	
-			if (gpio_get(PSEN_PIN)==0) {
+	   		if (gpio_get(PSEN_PIN)==0) {
 				SET_DATA_MODE_OUT;
     			gpio_put_masked(DATA_PIN_MASK,(rom_table[bank][addr])<<D0_PIN);
 			} 
-		  }
+		  	if((gpio_get(CS_PIN)==0) && (gpio_get(WR_PIN)==0)) {
+				   extram[addr & 0xff]=((pins & DATA_PIN_MASK)>>D0_PIN);	
+				   if (extram[0xff]==0xaa) {
+			         gamechoosen=extram[0xfe];
+				   }
+			} 
+			
 		 SET_DATA_MODE_IN;
 		}
+
 	SET_DATA_MODE_IN;
-	
+	    
 	switch (new_bank_type) {
 	  case 0:  // standard 2k / 4k
         while(1) {	
@@ -235,16 +239,18 @@ void __not_in_flash_func(core1_main()) {
 		break;
 	  case 2:   // XROM
         while(1) {	
-	    	pins=gpio_get_all();
+			pins=gpio_get_all();
 	        addr = (pins & 0b0111111111111); // for all cart but xrom
-	  		if ((gpio_get(PSEN_PIN)==0 )) {
-				SET_DATA_MODE_OUT;
-    			gpio_put_masked(DATA_PIN_MASK,(rom_table[0][addr])<<D0_PIN);
-			} 
-			if ((gpio_get(P11_PIN)==1 )) {
-				SET_DATA_MODE_OUT;
-    			gpio_put_masked(DATA_PIN_MASK,(extROM[addr])<<D0_PIN);
-			}
+	  		if ((gpio_get(P11_PIN)==1 && gpio_get(NOTCS_PIN)==1)) {
+					SET_DATA_MODE_OUT;
+    				gpio_put_masked(DATA_PIN_MASK,(extROM[addr&0x3ff])<<D0_PIN);
+			} else {
+				if (gpio_get(PSEN_PIN)==0) {
+					SET_DATA_MODE_OUT;
+    				gpio_put_masked(DATA_PIN_MASK,(rom_table[0][addr])<<D0_PIN);	
+				} 
+			} 	
+			
 		 SET_DATA_MODE_IN;
 		}
 		break;
@@ -558,11 +564,12 @@ int load_newfile(char *filename) {
 	nb = l/2048;   // nb = number of banks, l=file size)
 		
     if ((strcmp(filename,"vp_40.bin")==0)||((strcmp(filename,"vp_31.bin")==0))) {  // 3k games
-	        if (f_read(&fil, &extROM[0], 1024, &br) != FR_OK) {
-               error(2);
+	        new_bank_type=2;
+			if (f_read(&fil, &extROM[0], 1024, &br) != FR_OK) {
+              // error(2);
             }
             if (f_read(&fil, &new_rom_table[0][1024], 3072, &br) != FR_OK) {
-                error(3);
+               // error(3);
             } 	
 	} else
 
@@ -607,12 +614,7 @@ void picopac_cart_main()
 	 int ret=0;
 
     int l, nb;
- 	// overclocking isn't necessary for most functions - but XEGS carts weren't working without it
-	// I guess we might as well have it on all the time.
-    
-	set_sys_clock_khz(270000, true);
-    //set_sys_clock_khz(170000, true);
-  
+   
 
     gpio_init_mask(ALL_GPIO_MASK);
   
@@ -628,7 +630,14 @@ void picopac_cart_main()
 
    load_file("/selectgame.bin");
    //load_file("/pb_q-bert.bin");
-   
+
+  	// overclocking isn't necessary for most functions - but XEGS carts weren't working without it
+	// I guess we might as well have it on all the time.
+    
+	set_sys_clock_khz(270000, true);
+    //set_sys_clock_khz(170000, true);
+
+
   memset(extram,0,0xff);
   //load_file("/vp_38.bin");
   //load_file("/vp_59_16.bin");
