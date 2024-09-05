@@ -769,12 +769,13 @@ firepressed
 	
 	add a,#1
 	
-	mov r1,#07fh
+	mov r1,#0feh
 	movx @r1,a
 	
-	mov r1,#07eh
-	mov a,#00ah ; ":" char for selected
+	mov r1,#0ffh
+	mov a,#0aah ; ":" char for selected
 	movx @r1,a 
+	
 	
 ;--------------------------------------------------------------------
 	ret
