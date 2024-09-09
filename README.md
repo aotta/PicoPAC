@@ -12,6 +12,8 @@ PicoPAC is a multicart DIY yourself based on cheap "PURPLE" Raspberry Pi Pico cl
 **NOTE** filename are "fixed" and hardcoded in firmware to match the "selectgame.bin" menu. You should find all the ROM with matching filenames following this site https://rene-g7400.datatex.nl/ 
 Please don't forget to upload the here provided "selectgame.bin" file in flash!!!!
 
+**NOTE 2** 3D files for shell are WIP and probably the PCB doesn't fit perfectly withous some cut/drill to PCB holes!!
+
 ![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/picopac3.jpg)
 ![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/picopac6.jpg)
 ![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/picopac1.jpg)
