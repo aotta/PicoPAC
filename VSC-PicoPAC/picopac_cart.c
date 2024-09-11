@@ -120,11 +120,10 @@ unsigned char rom_table[8][4096];
 unsigned char new_rom_table[8][4096];
 unsigned char extROM[1024];
 unsigned char RAM[1024];
-unsigned char files[256*100] = {0};
+unsigned char files[256*255] = {0};
 unsigned char nomefiles[32*25] = {0};
 char curPath[256] = "";
 char path[256];
-int fileda=0,filea=0;
 volatile char cmd=0;
 char errorBuf[40];
 bool cmd_executing;
@@ -323,12 +322,35 @@ void reset() {
  	}
   SET_DATA_MODE_IN;
 
-
-
 }       
 
 ////////////////////////////////////////////////////////////////////////////////////
 
+static const unsigned char chartable [128] = 
+  { 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, // 0..9
+    0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, // 10..19
+    0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, // 20..29
+    0x3F, 0x3F, 0x0C, 0x3F, 0x3F, 0x3F, 0x0B, 0x3E, 0x10, 0x3F, // 30..39
+    0x2E, 0x3B, 0x29, 0x10, 0x27, 0x28, 0x27, 0x2A, 0x00, 0x01, // 40..49 
+    0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0A, // 50..59
+    0x3F, 0x2B, 0x3F, 0x0D, 0x3F, 0x20, 0x25, 0x23, 0x1A, 0x12, // 60..69
+    0x1B, 0x1C, 0x1d, 0x16, 0x1E, 0x1F, 0x0E, 0x26, 0x2D, 0x17, // 70..79
+    0x0F, 0x18, 0x13, 0x19, 0x14, 0x15, 0x24, 0x11, 0x22, 0x2C, // 80..89
+    0x21, 0x3F, 0x3B, 0x3F, 0x3F, 0x28, 0x3F, 0x20, 0x25, 0x23, // 90..99
+    0x1A, 0x12, 0x1B, 0x1C, 0x1d, 0x16, 0x1E, 0x1F, 0x0E, 0x26, // 100..109
+    0x2D, 0x17, 0x0F, 0x18, 0x13, 0x19, 0x14, 0x15, 0x24, 0x11, // 110..119
+    0x22, 0x2C, 0x21, 0x2E, 0x2E, 0x3B, 0x3F, 0x3F};            // 120..127
+    
+char ASCII_to_VP(char c){
+   if (c <128) {
+      return chartable[c];
+   } else {
+      return 0x3F;
+   }
+  
+}
+
+///////////////////////
 typedef struct {
 	char isDir;
 	char filename[13];
@@ -387,7 +409,7 @@ int scan_files(char *path, char *search)
 	res = f_opendir(&dir, path);
 	if (res == FR_OK) {
 		for (;;) {
-			if (num_dir_entries == 99) break;
+			if (num_dir_entries == 255) break;
 			res = f_readdir(&dir, &fno);
 			if (res != FR_OK || fno.fname[0] == 0) break;
 			if (fno.fattrib & (AM_HID | AM_SYS)) continue;
@@ -454,6 +476,55 @@ int search_directory(char *path, char *search) {
 }
 
 
+int read_directory(char *path) {
+	int ret = 0;
+	num_dir_entries = 0;
+	DIR_ENTRY *dst = (DIR_ENTRY *)&files[0];
+
+    if (!fatfs_is_mounted())
+       mount_fatfs_disk();
+
+	FATFS FatFs;
+	if (f_mount(&FatFs, "", 1) == FR_OK) {
+		DIR dir;
+		if (f_opendir(&dir, path) == FR_OK) {
+			while (num_dir_entries < 255) {
+				if (f_readdir(&dir, &fno) != FR_OK || fno.fname[0] == 0)
+					break;
+				if (fno.fattrib & (AM_HID | AM_SYS))
+					continue;
+				dst->isDir = fno.fattrib & AM_DIR ? 1 : 0;
+				if (!dst->isDir)
+					if (!is_valid_file(fno.fname)) continue;
+				// copy file record to first ram block
+				// long file name
+				strncpy(dst->long_filename, fno.fname, 31);
+				dst->long_filename[31] = 0;
+				// 8.3 name
+				if (fno.altname[0])
+		            strcpy(dst->filename, fno.altname);
+				else {	// no altname when lfn is 8.3
+					strncpy(dst->filename, fno.fname, 12);
+					dst->filename[12] = 0;
+				}
+				dst->full_path[0] = 0; // path only for search results
+	            dst++;
+				num_dir_entries++;
+			}
+			f_closedir(&dir);
+		}
+		else
+			strcpy(errorBuf, "Can't read directory");
+		f_mount(0, "", 1);
+		qsort((DIR_ENTRY *)&files[0], num_dir_entries, sizeof(DIR_ENTRY), entry_compare);
+		ret = 1;
+	}
+	else
+		strcpy(errorBuf, "Can't read flash memory");
+	return ret;
+}
+
+
 int filesize(char *filename) {
     if (!fatfs_is_mounted())
        mount_fatfs_disk();
@@ -495,8 +566,7 @@ int load_file(char *filename) {
 	UINT br = 0;
 	UINT bw = 0;
     int l,nb;
-    int k=0;
-
+    
 			memset(rom_table,0,1024*8*4);
 	
 	l=filesize(filename);
@@ -515,7 +585,7 @@ int load_file(char *filename) {
 	
 	FIL fil;
 	if (f_open(&fil, filename, FA_READ) != FR_OK) {
-		error(2);
+		error(6);
 	}
 	
 
@@ -523,10 +593,9 @@ int load_file(char *filename) {
 	
 		for (int i = nb - 1; i >= 0; i--) {
         	if (f_read(&fil,&rom_table[i][1024], 2048, &br)!= FR_OK) {
-				error(3);
+				error(9);
 			}
-			k=k+1;
-        	memcpy(&rom_table[i][3072], &rom_table[i][2048], 1024); /* simulate missing A10 */
+	    	memcpy(&rom_table[i][3072], &rom_table[i][2048], 1024); /* simulate missing A10 */
     	}
             // mirror ROM in higher banks
     if (nb<2) memcpy(&rom_table[1],&rom_table[0],4096);
@@ -546,8 +615,7 @@ int load_newfile(char *filename) {
 	UINT br = 0;
 	UINT bw = 0;
     int l,nb;
-    int k=0;
-
+    
 	memset(new_rom_table,0,1024*8*4);
 	
 	l=filesize(filename);
@@ -558,18 +626,18 @@ int load_newfile(char *filename) {
 
 	FIL fil;
 	if (f_open(&fil, filename, FA_READ) != FR_OK) {
-		error(2);
+		error(4);
 	}
     
 	nb = l/2048;   // nb = number of banks, l=file size)
 		
-    if ((strcmp(filename,"vp_40.bin")==0)||((strcmp(filename,"vp_31.bin")==0))) {  // 3k games
+    if ((strcmp(filename,"vp_40.bin")==0)||((strcmp(filename,"vp_31.bin")==0))||((strcmp(filename,"4inarow.bin")==0))) {  // 3k games
 	        new_bank_type=2;
 			if (f_read(&fil, &extROM[0], 1024, &br) != FR_OK) {
-              // error(2);
+              // error(5);
             }
             if (f_read(&fil, &new_rom_table[0][1024], 3072, &br) != FR_OK) {
-               // error(3);
+               // error(7);
             } 	
 	} else
 
@@ -580,9 +648,9 @@ int load_newfile(char *filename) {
 
 		for (int i = nb - 1; i >= 0; i--) {
         	if (f_read(&fil,&new_rom_table[i][1024], 2048, &br)!= FR_OK) {
-				error(3);
+				error(7);
 			}
-			k=k+1;
+	
         	memcpy(&new_rom_table[i][3072], &new_rom_table[i][2048], 1024); /* simulate missing A10 */
     	}
 	}
@@ -600,6 +668,161 @@ cleanup:
 	return br;
 }
 
+void convert_ascii_file_to_VP(char* dest, char* source){
+  dest[0]=ASCII_to_VP(' ');
+  for (int i=1; i<16; i++){
+    if (i-1 < strlen(source))
+      dest[i]=ASCII_to_VP(source[i-1]);
+    else
+      dest[i] = ASCII_to_VP(' ');
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+//                     filelist
+////////////////////////////////////////////////////////////////////////////////////
+
+void filelist(DIR_ENTRY* en,int da, int a)
+{
+  char longfilename[32];
+  char tmp[32];
+  char VPfile[16];
+  unsigned long int pos;
+  char block[0x80];
+  u_int8_t riga=0;
+  u_int8_t blocco=0;
+  u_int8_t selectori[1024*16];
+
+  FATFS FatFs;
+  UINT br = 0;
+  UINT bw = 0;
+  uint numfiles=0;
+
+  const int block_addr[] = // andrea
+  {
+  0x1c00, 0x1d00, 0x1e00, 0x1f00, 0x1100, 0x1200, 0x1300, 0x1400, // 7
+  0x1500, 0x1600, 0x1700, 0x0900, 0x0a00, 0x0b00, 0x0c00, 0x0d00, //15
+  0x0e00, 0x0f00, 0x0100, 0x0200, 0x0300, 0x0400, 0x0500, 0x0600, //23
+  0x0700, 0x0800, 0x1c00, 0x1c00, 0x1c00, 0x1c00, 0x1c00, 0x1c00,
+  }; 
+ 	
+	if (f_mount(&FatFs, "", 1) != FR_OK) {
+		error(1);
+	}
+FIL fil,fil2;
+ 
+   //open file "Selectgame.$$$" for input/output:
+	
+	if (f_open(&fil, "/selectgame.$$$", FA_READ) != FR_OK) {
+		sleep_ms(100);
+		error(2);
+		goto cleanup;
+	}
+	
+	for (int i=0;i<8;i++) {
+		f_lseek(&fil,1024*i);
+         if (f_read(&fil, &selectori[1024*i], 1024, &br)!= FR_OK) { 	error(i); 	}
+	}
+  
+  	    	
+    f_close(&fil);
+	
+	
+
+    // open file "Selectgame.bin" for input/output:
+	if (f_open(&fil, "/selectgame.bin", FA_READ|FA_WRITE) != FR_OK) {
+		sleep_ms(100);
+		error(3);
+		goto cleanup;
+	}
+	     f_write(&fil,&selectori,4*1024,&bw);
+		f_lseek(&fil,0);
+		
+    memset(block,10,sizeof(block));
+	
+	SET_LED_ON;
+
+    for(int n = 0;n<a;n++) {
+		memset(longfilename,0,32);
+		
+	 	if (en[n].isDir) {
+			//	dir not supported
+	 	} else {
+			strcpy(longfilename, en[n].long_filename);
+ 		   /// rimuovo il .bin
+      		memset(tmp,0,sizeof(tmp));
+      		int j=32;
+      		int dot=0;
+      		while ((longfilename[j]!='.')&&(j>0)) {
+      			dot=j;
+      			j--;
+      		}
+      		for (int i=0;i<j;i++) tmp[i]=longfilename[i];
+      		tmp[j]=0;      
+      		memcpy(longfilename,tmp,sizeof(tmp));
+	 	 }
+    	  
+		  convert_ascii_file_to_VP(VPfile,(char*)&longfilename);
+		  for (int i=0;i<16;i++) {
+			block[(riga*16)+i]=VPfile[i];
+		  }
+		
+		  strcpy(gamelist[numfiles],en[n].long_filename);
+
+	      if (strcmp(tmp,"selectgame")) {
+			riga++;
+			numfiles++;	
+			}
+		  
+
+		  if (riga==8) {
+		    int res = f_lseek(&fil, block_addr[blocco]+0x80);
+            blocco++;
+		    f_write(&fil,&block,0x80,&bw);
+			memset(block,0x28,sizeof(block));
+			riga=0;
+		  }	
+		}
+		if (riga!=0) {
+		    int res = f_lseek(&fil, block_addr[blocco]+0x80);
+            blocco++;
+		    f_write(&fil,&block,0x80,&bw);
+			memset(block,0,sizeof(block));
+			riga=0;
+		}
+            numfiles--; 
+	   	    int res = f_lseek(&fil, 0x1aef);
+		    f_write(&fil,&numfiles,1,&bw);
+		
+		
+    
+closefile:
+	f_close(&fil);
+	    
+cleanup:
+	f_mount(0, "", 1);
+  }
+
+////////////////////////////////////////////////////////////////////////////////////
+//                     Launch Menu
+////////////////////////////////////////////////////////////////////////////////////
+
+void videopacMenu() {  
+  int numfile=0;
+  int maxfile=0;
+  int ret=0;
+  int rootpos[255];
+  int fileda=0,filea=0;
+
+          ret = read_directory(curPath);
+		  if (!(ret)) error(1);
+		  maxfile=25*8;
+		  if (maxfile>num_dir_entries) maxfile=num_dir_entries;
+		  filea=fileda+maxfile;
+		  filelist((DIR_ENTRY *)&files[0],fileda,filea);
+		  //sleep_ms(1400);
+
+ }
 
 ////////////////////////////////////////////////////////////////////////////////////
 //                     PicoPAC Cart Main
@@ -626,11 +849,12 @@ void picopac_cart_main()
   sleep_ms(400);
 
   multicore_launch_core1(core1_main);
-  sleep_ms(200);
+  videopacMenu();
+  sleep_ms(160);
+  
+  load_file("/selectgame.bin");
 
-   load_file("/selectgame.bin");
-   //load_file("/pb_q-bert.bin");
-
+ 
   	// overclocking isn't necessary for most functions - but XEGS carts weren't working without it
 	// I guess we might as well have it on all the time.
     
@@ -639,9 +863,7 @@ void picopac_cart_main()
 
 
   memset(extram,0,0xff);
-  //load_file("/vp_38.bin");
-  //load_file("/vp_59_16.bin");
-  
+ 
     
   // Initial conditions 
   curPath[0]=0;
@@ -650,7 +872,7 @@ void picopac_cart_main()
    
     if ((gamechoosen>=1)) {
 
-	sleep_ms(1800);
+	sleep_ms(1400);
 
 	load_newfile(gamelist[gamechoosen-1]);
 	//reset();
