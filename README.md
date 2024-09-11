@@ -1,4 +1,4 @@
-# PicoPAC
+# PicoPAC v.1.0a
 Flashcart for Videopac / Odyssey 2 based on Wilco2009 Videopac-microSD card project
 Based on SD card by Wilco2009: https://github.com/wilco2009/Videopac-micro-SD-Cart , my greetings for his fantastic job!
 
