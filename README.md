@@ -5,13 +5,14 @@ Based on SD card by Wilco2009: https://github.com/wilco2009/Videopac-micro-SD-Ca
 Since now, tested on  G-7000, G7400, C52, JOPAC and Odyssey 2. Waiting for a friend that has to repair his G7200 for completing the list ;) 
 
 Added support to extROM games too (VP_40 and VP_31).
-Added filename reading from flash (max files read = 25*8)
+Added filename reading from flash (max files read = 25*8)-
 
 PicoPAC is a multicart DIY yourself based on cheap "PURPLE" Raspberry Pi Pico clone, easy to build and not expensive.
 **WARNING!** "purple" Pico has not the same pinout of original Raspberry "green" ones, you MUST use the clone or you may damage your hardware.
 
 **NOTE** You should find all the ROM following this site https://rene-g7400.datatex.nl/ 
 Please don't forget to upload the here provided "selectgame.bin" and "selectgame.$$$" file in flash!!!!
+Also, even if now you can change filenames, remember that extROM games are checked by name, so they works only if named "VP_31.bin", "VP_40.bin" or "4inarow.bin"!
 
 **NOTE 2** 3D files for shell are WIP and probably the PCB doesn't fit perfectly withous some cut/drill to PCB holes!! (Thanks to Mike Wilson for the Logo version)
 
