@@ -7,6 +7,8 @@ Since now, tested on  G-7000, G7400, C52, JOPAC and Odyssey 2. Waiting for a fri
 Added support to extROM games too (VP_40 and VP_31).
 Added filename reading from flash (max files read = 25*8)-
 
+Other info also on Nightfallcrew blog: https://www.nightfallcrew.com/22/09/2024/flash-multicart-for-philips-videopac-magnavox-odyssey-2/
+
 PicoPAC is a multicart DIY yourself based on cheap "PURPLE" Raspberry Pi Pico clone, easy to build and not expensive.
 **WARNING!** "purple" Pico has not the same pinout of original Raspberry "green" ones, you MUST use the clone or you may damage your hardware.
 
