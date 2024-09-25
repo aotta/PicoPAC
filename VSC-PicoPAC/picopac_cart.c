@@ -29,8 +29,6 @@
 #include "hardware/sync.h"
 
 
-#include "gamelist.h"
-
 #include "tusb.h"
 #include "ff.h"
 #include "fatfs_disk.h"
@@ -115,6 +113,7 @@
 
 
 char RBLo,RBHi;
+char gamelist[255][32];
 #define BINLENGTH  1024*128+1
 unsigned char rom_table[8][4096];
 unsigned char new_rom_table[8][4096];
@@ -847,7 +846,7 @@ void picopac_cart_main()
 
  
   sleep_ms(400);
-
+  memset(gamelist,'_',sizeof(gamelist));
   multicore_launch_core1(core1_main);
   videopacMenu();
   sleep_ms(160);
