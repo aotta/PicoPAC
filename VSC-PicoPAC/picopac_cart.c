@@ -275,6 +275,19 @@ void __not_in_flash_func(core1_main()) {
 		  //}
 		}
 		break;
+		case 4:  // flat 12k (new KTAA)
+        while(1) {	
+	    	pins=gpio_get_all();
+	        addr = (pins & 0b0111111111111);  
+			bank=3-((gpio_get(P10_PIN)+(gpio_get(P11_PIN)*2)));
+	   		
+			if (gpio_get(PSEN_PIN)==0) {
+				SET_DATA_MODE_OUT;
+    			gpio_put_masked(DATA_PIN_MASK,(rom_table[bank][addr])<<D0_PIN);
+			} 
+		 SET_DATA_MODE_IN;
+		}
+		break;
 	}
 }
 #pragma GCC pop_options
@@ -638,9 +651,16 @@ int load_newfile(char *filename) {
             if (f_read(&fil, &new_rom_table[0][1024], 3072, &br) != FR_OK) {
                // error(7);
             } 	
-	} else
-
-	 {
+	} else if ((strstr(filename,"ktaa")!=0)&&(nb==6)) {
+	//	SET_LED_ON;
+         new_bank_type=4;
+		 nb=l/3072;
+		 for (int i = nb - 1; i >= 0; i--) {
+        	if (f_read(&fil,&new_rom_table[i][1024], 3072, &br)!= FR_OK) {
+				error(7);
+			}
+	    }
+	} else {
 		new_bank_type=0;
 		if (nb==4) new_bank_type=1;
 		if (nb>4) new_bank_type=3;
@@ -649,14 +669,13 @@ int load_newfile(char *filename) {
         	if (f_read(&fil,&new_rom_table[i][1024], 2048, &br)!= FR_OK) {
 				error(7);
 			}
-	
-        	memcpy(&new_rom_table[i][3072], &new_rom_table[i][2048], 1024); /* simulate missing A10 */
+	    	memcpy(&new_rom_table[i][3072], &new_rom_table[i][2048], 1024); /* simulate missing A10 */
     	}
 	}
 	    // mirror ROM in higher banks
     if (nb<2) memcpy(&new_rom_table[1],&new_rom_table[0],4096);
-    if (nb<4) memcpy(&new_rom_table[2],&new_rom_table[0],8192);
-   	
+   	if (nb<4) memcpy(&new_rom_table[2],&new_rom_table[0],8192);
+	
 	
 closefile:
 	f_close(&fil);
@@ -739,8 +758,7 @@ FIL fil,fil2;
 		
     memset(block,10,sizeof(block));
 	
-	SET_LED_ON;
-
+	
     for(int n = 0;n<a;n++) {
 		memset(longfilename,0,32);
 		
