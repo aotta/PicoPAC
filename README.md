@@ -1,4 +1,4 @@
-# PicoPAC v.1.0a
+# PicoPAC v.1.0b
 Flashcart for Videopac / Odyssey 2 based on Wilco2009 Videopac-microSD card project
 Based on SD card by Wilco2009: https://github.com/wilco2009/Videopac-micro-SD-Cart , my greetings for his fantastic job!
 
@@ -11,6 +11,8 @@ Other info also on Nightfallcrew blog: https://www.nightfallcrew.com/22/09/2024/
 
 PicoPAC is a multicart DIY yourself based on cheap "PURPLE" Raspberry Pi Pico clone, easy to build and not expensive.
 **WARNING!** "purple" Pico has not the same pinout of original Raspberry "green" ones, you MUST use the clone or you may damage your hardware.
+
+--changelog v.1.0b -> fixed KTAA final rom
 
 **NOTE** You should find all the ROM following this site https://rene-g7400.datatex.nl/ 
 Please don't forget to upload the here provided "selectgame.bin" and "selectgame.$$$" file in flash!!!!
