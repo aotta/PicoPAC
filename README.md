@@ -5,9 +5,12 @@ Based on SD card by Wilco2009: https://github.com/wilco2009/Videopac-micro-SD-Ca
 Since now, tested on  G-7000, G7400, C52, JOPAC and Odyssey 2. Waiting for a friend that has to repair his G7200 for completing the list ;) 
 
 --changelog v.1.0a ->
+
 Added support to extROM games too (VP_40 and VP_31).
-Added filename reading from flash (max files read = 25*8)-
+Added filename reading from flash (max files read = 25*8) 
+
 --changelog v.1.0b ->
+
 fixed KTAA final rom
 
 Other info also on Nightfallcrew blog: https://www.nightfallcrew.com/22/09/2024/flash-multicart-for-philips-videopac-magnavox-odyssey-2/
