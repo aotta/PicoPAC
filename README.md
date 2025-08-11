@@ -23,6 +23,8 @@ Also, even if now you can change filenames, remember that extROM games are check
 
 **NOTE 2** 3D files for shell are WIP and probably the PCB doesn't fit perfectly withous some cut/drill to PCB holes!! (Thanks to Mike Wilson for the Logo version)
 
+Added alternate STLs files thanks to kokkiklhs (see https://forums.atariage.com/topic/370606-picopac-a-pico-purple-porting-of-videopac-microsdcard/page/4/#comment-5700299 for further details)
+
 ![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/picopac3.jpg)
 ![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/picopac6.jpg)
 ![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/picopac1.jpg)
