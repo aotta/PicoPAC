@@ -1,4 +1,7 @@
-# PicoPAC v.1.0b
+# PicoPAC 
+
+# New version 2.0 is planned in next days, with bug fixes and Basic and Chess support!!
+
 Flashcart for Videopac / Odyssey 2 based on Wilco2009 Videopac-microSD card project
 Based on SD card by Wilco2009: https://github.com/wilco2009/Videopac-micro-SD-Cart , my greetings for his fantastic job!
 
