@@ -7,6 +7,8 @@
 Flashcart for Videopac / Odyssey 2 based on Wilco2009 Videopac-microSD card project
 Based on SD card by Wilco2009: https://github.com/wilco2009/Videopac-micro-SD-Cart , my greetings for his fantastic job!
 
+more info on https://forums.atariage.com/topic/374297-picoa10400-preview/
+
 Since now, tested on  G-7000, G7400, C52, JOPAC and Odyssey 2. Waiting for a friend that has to repair his G7200 for completing the list ;) 
 
 --changelog v.1.0a ->
