@@ -19,6 +19,7 @@ Added filename reading from flash (max files read = 25*8)
 fixed KTAA final rom
 
 --changelog v.2.0 -> Loaded uf2 file, in next days i'll update the repo with source and documentation
+- support for folders, no more selectgame.* files need, support for Basic and Chess (use the bin files in [bin] direcotry)
 
 Other info also on Nightfallcrew blog: https://www.nightfallcrew.com/22/09/2024/flash-multicart-for-philips-videopac-magnavox-odyssey-2/
 
