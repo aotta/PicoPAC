@@ -3,6 +3,7 @@
 # New version 2.0 is planned in next days, with bug fixes and Basic and Chess support!!
 ![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/g7010_chess.jpeg)
 ![ScreenShot](https://raw.githubusercontent.com/aotta/PicoPAC/main/pictures/g7420_basic.jpeg)
+
 Flashcart for Videopac / Odyssey 2 based on Wilco2009 Videopac-microSD card project
 Based on SD card by Wilco2009: https://github.com/wilco2009/Videopac-micro-SD-Cart , my greetings for his fantastic job!
 
@@ -14,6 +15,8 @@ Added filename reading from flash (max files read = 25*8)
 
 --changelog v.1.0b ->
 fixed KTAA final rom
+
+--changelog v.2.0 -> Loaded uf2 file, in next days i'll update the repo with source and documentation
 
 Other info also on Nightfallcrew blog: https://www.nightfallcrew.com/22/09/2024/flash-multicart-for-philips-videopac-magnavox-odyssey-2/
 
